@@ -122,16 +122,14 @@ def test_a_partially_traced_file_is_the_dangerous_case(tmp_path, python):
     )
 
 
-def test_a_stale_map_selects_by_line_numbers_that_have_moved(tmp_path, python):
+def test_a_stale_map_selects_by_line_numbers_that_have_moved(tmp_path, python, make_project):
     """The map is a photograph. Insert a line above a function and every line below it
     shifts, so a diff naming line 12 no longer means what the map's line 12 meant.
 
     Nothing here detects that. The map has to be rebuilt when the tree moves, and the tool
     says so rather than pretending a stored map stays true.
     """
-    from tests.conftest import build_project
-
-    root = build_project(tmp_path / "p")
+    root = make_project(tmp_path / "p")
     m = mapping.build(root, "tests", python=python)
     assert m.traced_ok, m.error
 

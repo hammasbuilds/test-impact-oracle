@@ -104,15 +104,13 @@ def test_summary_counts_what_it_says(project, python):
     assert s["mean_lines_per_test"] > 0
 
 
-def test_fixture_work_is_attributed_to_the_test_that_uses_it(tmp_path, python):
+def test_fixture_work_is_attributed_to_the_test_that_uses_it(tmp_path, python, make_project):
     """Setup runs before the call phase; tracing only the call would miss all of it.
 
     A change inside a fixture has to select every test that uses it, and missing those
     would be silent - which is the failure mode that matters for a selection tool.
     """
-    from tests.conftest import build_project
-
-    root = build_project(tmp_path / "p")
+    root = make_project(tmp_path / "p")
     (root / "src" / "demo" / "fixtures.py").write_text(
         "def expensive_setup():\n    return [1, 2, 3]\n", encoding="utf-8"
     )

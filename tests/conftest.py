@@ -88,6 +88,17 @@ def project(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def make_project():
+    """Build the fixture project somewhere of your choosing.
+
+    A fixture rather than an import, because `from tests.conftest import build_project`
+    only works when something has put the repo root on `sys.path` - true locally, false on
+    a clean checkout, which is where CI found it.
+    """
+    return build_project
+
+
+@pytest.fixture
 def python() -> str:
     """This interpreter. It has pytest, which is all the fixture project needs."""
     return sys.executable
