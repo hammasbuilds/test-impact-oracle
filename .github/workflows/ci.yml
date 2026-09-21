@@ -1,0 +1,27 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/pyproject.toml"
+      - run: uv sync --all-extras
+
+      - name: Lint
+        run: |
+          uv run ruff check src tests
+          uv run ruff format --check src tests
+
+      # The suite writes a small project on disk and runs pytest against it under the
+      # tracer, so it needs no network and no repositories. The corpus numbers in
+      # docs/RESULTS.md come from real projects and are reproduced by hand, not here.
+      - name: Test
+        run: uv run pytest -q

@@ -1,0 +1,125 @@
+ .. repo-surgeon: copying
+ .. repo-surgeon: tracing the suite
+ .. repo-surgeon: baseline
+ .. repo-surgeon: 1/12 src/repo_surgeon/types.py:88 int: 2 -> 3 broke=0 missed=0
+ .. repo-surgeon: 2/12 src/repo_surgeon/rules/percent_format.py:33 boolop: And -> O broke=1 missed=0
+ .. repo-surgeon: 3/12 src/repo_surgeon/scout.py:259 bool: False -> True broke=0 missed=0
+ .. repo-surgeon: 4/12 src/repo_surgeon/pipeline.py:61 binop: Add -> Sub broke=0 missed=0
+ .. repo-surgeon: 5/12 src/repo_surgeon/rules/percent_format.py:39 int: 40 -> 41 broke=0 missed=0
+ .. repo-surgeon: 6/12 src/repo_surgeon/values.py:111 int: 8 -> 9 broke=0 missed=0
+ .. repo-surgeon: 7/12 src/repo_surgeon/verify/suite.py:46 bool: False -> True broke=0 missed=0
+ .. repo-surgeon: 8/12 src/repo_surgeon/ledger.py:28 bool: True -> False broke=2 missed=0
+ .. repo-surgeon: 9/12 src/repo_surgeon/verify/mutation.py:61 bool: True -> False broke=0 missed=0
+ .. repo-surgeon: 10/12 src/repo_surgeon/scout.py:94 int: 0 -> 1 broke=1 missed=0
+ .. repo-surgeon: 11/12 src/repo_surgeon/scout.py:141 compare: IsNot -> Is broke=2 missed=0
+ .. repo-surgeon: 12/12 src/repo_surgeon/verify/suite.py:43 bool: False -> True broke=0 missed=0
+ .. pr-referee: copying
+ .. pr-referee: tracing the suite
+ .. pr-referee: baseline
+ .. pr-referee: 1/12 src/pr_referee/score.py:28 int: 0 -> 1 broke=3 missed=0
+ .. pr-referee: 2/12 src/pr_referee/reviewer.py:65 int: 1 -> 2 broke=1 missed=0
+ .. pr-referee: 3/12 src/pr_referee/engine/mutation.py:141 boolop: Or -> And broke=0 missed=0
+ .. pr-referee: 4/12 src/pr_referee/reviewer.py:71 int: 8 -> 9 broke=0 missed=0
+ .. pr-referee: 5/12 src/pr_referee/extract.py:117 binop: Sub -> Add broke=1 missed=0
+ .. pr-referee: 6/12 src/pr_referee/engine/mutation.py:117 compare: NotIn -> In broke=2 missed=0
+ .. pr-referee: 7/12 src/pr_referee/bench.py:144 bool: False -> True broke=1 missed=0
+ .. pr-referee: 8/12 src/pr_referee/checks/statics.py:78 compare: In -> NotIn broke=3 missed=0
+ .. pr-referee: 9/12 src/pr_referee/bench.py:202 int: 0 -> 1 broke=0 missed=0
+ .. pr-referee: 10/12 src/pr_referee/engine/differential.py:212 int: 0 -> 1 broke=3 missed=0
+ .. pr-referee: 11/12 src/pr_referee/checks/statics.py:42 compare: Is -> IsNot broke=0 missed=0
+ .. pr-referee: 12/12 src/pr_referee/bench.py:94 compare: NotIn -> In broke=1 missed=0
+ .. trace-to-patch: copying
+ .. trace-to-patch: tracing the suite
+ .. trace-to-patch: baseline
+ .. trace-to-patch: 1/12 src/trace_to_patch/patch.py:215 int: 3 -> 4 broke=0 missed=0
+ .. trace-to-patch: 2/12 src/trace_to_patch/bench.py:52 bool: False -> True broke=0 missed=0
+ .. trace-to-patch: 3/12 src/trace_to_patch/locate/retrieval.py:218 boolop: And -> Or broke=0 missed=0
+ .. trace-to-patch: 4/12 src/trace_to_patch/bench.py:183 compare: GtE -> Gt broke=0 missed=0
+ .. trace-to-patch: 5/12 src/trace_to_patch/types.py:46 compare: In -> NotIn broke=3 missed=0
+ .. trace-to-patch: 6/12 src/trace_to_patch/reproduce.py:109 compare: NotEq -> Eq broke=2 missed=0
+ .. trace-to-patch: 7/12 src/trace_to_patch/failure.py:61 boolop: Or -> And broke=0 missed=0
+ .. trace-to-patch: 8/12 src/trace_to_patch/reproduce.py:120 compare: In -> NotIn broke=1 missed=0
+ .. trace-to-patch: 9/12 src/trace_to_patch/types.py:63 compare: NotEq -> Eq broke=1 missed=0
+ .. trace-to-patch: 10/12 src/trace_to_patch/locate/retrieval.py:128 int: 1 -> 2 broke=0 missed=0
+ .. trace-to-patch: 11/12 src/trace_to_patch/bench.py:82 boolop: And -> Or broke=1 missed=0
+ .. trace-to-patch: 12/12 src/trace_to_patch/patch.py:107 binop: Add -> Sub broke=1 missed=0
+ .. suite-auditor: copying
+ .. suite-auditor: tracing the suite
+ .. suite-auditor: baseline
+ .. suite-auditor: 1/12 src/suite_auditor/inputs.py:41 compare: Lt -> LtE broke=0 missed=0
+ .. suite-auditor: 2/12 src/suite_auditor/differential.py:203 int: 1 -> 2 broke=0 missed=0
+ .. suite-auditor: 3/12 src/suite_auditor/mutate.py:116 compare: NotIn -> In broke=2 missed=0
+ .. suite-auditor: 4/12 src/suite_auditor/coverage.py:122 bool: True -> False broke=0 missed=0
+ .. suite-auditor: 5/12 src/suite_auditor/types.py:102 int: 1 -> 2 broke=1 missed=0
+ .. suite-auditor: 6/12 src/suite_auditor/types.py:121 int: 0 -> 1 broke=1 missed=0
+ .. suite-auditor: 7/12 src/suite_auditor/audit.py:59 boolop: Or -> And broke=0 missed=0
+ .. suite-auditor: 8/12 src/suite_auditor/types.py:108 compare: IsNot -> Is broke=1 missed=0
+ .. suite-auditor: 9/12 src/suite_auditor/coverage.py:123 bool: True -> False broke=0 missed=0
+ .. suite-auditor: 10/12 src/suite_auditor/coverage.py:135 boolop: And -> Or broke=0 missed=0
+ .. suite-auditor: 11/12 src/suite_auditor/types.py:49 int: 0 -> 1 broke=0 missed=0
+ .. suite-auditor: 12/12 src/suite_auditor/inputs.py:58 boolop: And -> Or broke=0 missed=0
+ .. blast-radius: copying
+ .. blast-radius: tracing the suite
+ .. blast-radius: baseline
+ .. blast-radius: 1/12 src/blast_radius/probe.py:250 bool: True -> False broke=4 missed=0
+ .. blast-radius: 2/12 src/blast_radius/types.py:36 int: 0 -> 1 broke=0 missed=0
+ .. blast-radius: 3/12 src/blast_radius/diff.py:68 int: 12 -> 13 broke=0 missed=0
+ .. blast-radius: 4/12 src/blast_radius/types.py:50 int: 0 -> 1 broke=0 missed=0
+ .. blast-radius: 5/12 src/blast_radius/diff.py:47 int: 1 -> 2 broke=4 missed=0
+ .. blast-radius: 6/12 src/blast_radius/types.py:110 int: 0 -> 1 broke=1 missed=0
+ .. blast-radius: 7/12 src/blast_radius/diff.py:255 compare: NotIn -> In broke=2 missed=0
+ .. blast-radius: 8/12 src/blast_radius/diff.py:122 boolop: Or -> And broke=0 missed=0
+ .. blast-radius: 9/12 src/blast_radius/diff.py:189 int: 0 -> 1 broke=0 missed=0
+ .. blast-radius: 10/12 src/blast_radius/types.py:71 binop: Add -> Sub broke=2 missed=0
+ .. blast-radius: 11/12 src/blast_radius/probe.py:258 compare: In -> NotIn broke=4 missed=0
+ .. blast-radius: 12/12 src/blast_radius/probe.py:261 int: 1 -> 2 broke=0 missed=0
+ .. flake-detective: copying
+ .. flake-detective: tracing the suite
+ .. flake-detective: baseline
+ .. flake-detective: 1/12 src/flake_detective/report.py:23 binop: Sub -> Add broke=0 missed=0
+ .. flake-detective: 2/12 src/flake_detective/freeze.py:68 int: 2024 -> 2025 broke=0 missed=0
+ .. flake-detective: 3/12 src/flake_detective/run.py:46 compare: IsNot -> Is broke=1 missed=0
+ .. flake-detective: 4/12 src/flake_detective/classify.py:62 bool: False -> True broke=2 missed=0
+ .. flake-detective: 5/12 src/flake_detective/classify.py:95 boolop: And -> Or broke=18 missed=0
+ .. flake-detective: 6/12 src/flake_detective/fixture.py:165 compare: NotEq -> Eq broke=1 missed=0
+ .. flake-detective: 7/12 src/flake_detective/types.py:103 int: 0 -> 1 broke=2 missed=0
+ .. flake-detective: 8/12 src/flake_detective/fixture.py:153 compare: IsNot -> Is broke=4 missed=0
+ .. flake-detective: 9/12 src/flake_detective/types.py:103 int: 1 -> 2 broke=2 missed=0
+ .. flake-detective: 10/12 src/flake_detective/report.py:28 binop: Mult -> FloorDiv broke=5 missed=0
+ .. flake-detective: 11/12 src/flake_detective/fixture.py:142 bool: True -> False broke=0 missed=0
+ .. flake-detective: 12/12 src/flake_detective/fixture.py:165 boolop: And -> Or broke=0 missed=0
+ .. cartographer: copying
+ .. cartographer: tracing the suite
+ .. cartographer: baseline
+ .. cartographer: 1/12 src/cartographer/predict.py:61 int: 0 -> 1 broke=0 missed=0
+ .. cartographer: 2/12 src/cartographer/history.py:140 int: 1 -> 2 broke=2 missed=0
+ .. cartographer: 3/12 src/cartographer/report.py:29 binop: Sub -> Add broke=0 missed=0
+ .. cartographer: 4/12 src/cartographer/compare.py:234 binop: Add -> Sub broke=0 missed=0
+ .. cartographer: 5/12 src/cartographer/imports.py:144 binop: Sub -> Add broke=1 missed=0
+ .. cartographer: 6/12 src/cartographer/imports.py:151 boolop: Or -> And broke=3 missed=0
+ .. cartographer: 7/12 src/cartographer/predict.py:65 int: 0 -> 1 broke=0 missed=0
+ .. cartographer: 8/12 src/cartographer/compare.py:182 compare: NotIn -> In broke=10 missed=0
+ .. cartographer: 9/12 src/cartographer/cli.py:92 int: 1 -> 2 broke=1 missed=0
+ .. cartographer: 10/12 src/cartographer/cli.py:107 int: 0 -> 1 broke=1 missed=0
+ .. cartographer: 11/12 src/cartographer/history.py:139 int: 3 -> 4 broke=2 missed=0
+ .. cartographer: 12/12 src/cartographer/report.py:94 int: 76 -> 77 broke=0 missed=0
+==============================================================================
+TEST SELECTION - safety against reduction
+==============================================================================
+7 repositories, 287 tests, 84 mutants, 596.2s
+
+     41  mutants broke nothing - the suite cannot tell the versions apart, so there was nothing to catch
+     43  mutants broke at least one test
+     43  of those had EVERY broken test selected (100.0% safe)
+        mean reduction: 90.1% of the suite skipped
+        wall clock: 92s of selected runs against 241s of full runs (62% saved)
+
+repo                    tests  mutants  broke   safe  reduction
+------------------------------------------------------------------------------
+repo-surgeon               47       12      4   100%        94%
+pr-referee                 37       12      8   100%        91%
+trace-to-patch             30       12      6   100%        92%
+suite-auditor              24       12      4   100%        94%
+blast-radius               28       12      6   100%        87%
+flake-detective            55       12      8   100%        87%
+cartographer               66       12      7   100%        89%

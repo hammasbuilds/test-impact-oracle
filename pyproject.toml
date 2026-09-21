@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "test-impact-oracle"
+version = "0.1.0"
+description = "Run only the tests a change could possibly affect - and measure what that skips"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "hammasbuilds" }]
+keywords = ["test selection", "test impact analysis", "ci", "pytest", "coverage", "mutation testing"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Testing",
+]
+# No runtime dependencies. The tracer is a generated pytest plugin built on sys.settrace;
+# coverage.py is not needed to answer "did this test execute this line".
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+test-impact-oracle = "test_impact_oracle.cli:main"
+tio = "test_impact_oracle.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/hammasbuilds/test-impact-oracle"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/test_impact_oracle"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
