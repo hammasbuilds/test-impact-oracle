@@ -21,10 +21,10 @@ ROOT = Path(__file__).resolve().parent
 
 
 def main() -> int:
-    print('test-impact-oracle: which tests actually exercise which files?', flush=True)
+    print("test-impact-oracle: which tests actually exercise which files?", flush=True)
     print(flush=True)
     result = subprocess.run(
-        [sys.executable, "-m", 'test_impact_oracle.cli', "map", "."],
+        [sys.executable, "-m", "test_impact_oracle.cli", "map", "."],
         cwd=ROOT,
         env={**os.environ, "PYTHONPATH": str(ROOT / "src"), "PYTHONIOENCODING": "utf-8"},
         check=False,
@@ -34,8 +34,8 @@ def main() -> int:
     print(flush=True)
     print("Point it at your own code with:", flush=True)
     for line in (
-        'test-impact-oracle map <repo>',
-        'test-impact-oracle select <repo> --changed <file>',
+        "test-impact-oracle map <repo>",
+        "test-impact-oracle select <repo> --changed <file>",
     ):
         print("    " + line, flush=True)
     return 0
