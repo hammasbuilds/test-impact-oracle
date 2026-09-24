@@ -33,7 +33,10 @@ def main() -> int:
         return result.returncode
     print(flush=True)
     print("Point it at your own code with:", flush=True)
-    for line in ['test-impact-oracle map <repo>', 'test-impact-oracle select <repo> --changed <file>']:
+    for line in (
+        'test-impact-oracle map <repo>',
+        'test-impact-oracle select <repo> --changed <file>',
+    ):
         print("    " + line, flush=True)
     return 0
 

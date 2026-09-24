@@ -1,6 +1,6 @@
 {
 "root": "D:/github/test-impact-oracle",
-"seconds": 22.954513788223267,
+"seconds": 18.90218949317932,
 "tests": {
 "tests/test_blind_spots.py::test_code_that_only_runs_in_a_subprocess_is_invisible": [
 "src/test_impact_oracle/mapping.py:105",
