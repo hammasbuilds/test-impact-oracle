@@ -2,13 +2,12 @@
 <p align="center"><i>Run only the tests a change could possibly affect — and measure what that skips, not just what it saves</i></p>
 
 <p align="center">
-  <a href="#the-through-line">The through-line</a> &middot;
-  <a href="#the-result">The result</a> &middot;
+  <a href="#what-it-does">What it does</a> &middot;
+  <a href="#results">Results</a> &middot;
   <a href="docs/RESULTS.md">Full results</a> &middot;
   <a href="#how-it-works">How it works</a> &middot;
   <a href="#run-it">Run it</a> &middot;
-  <a href="#what-this-does-not-do">What it does NOT do</a> &middot;
-  <a href="#problems-hit-while-building-this">Problems hit</a>
+  <a href="#scope">Scope</a> 
 </p>
 
 <p align="center">
@@ -22,7 +21,7 @@
 
 ---
 
-## The through-line
+## What it does
 
 ```mermaid
 flowchart LR
@@ -49,7 +48,7 @@ something, how many had every broken test selected?**
 
 So this measures both, on changes whose consequences are known.
 
-## The result
+## Results
 
 Seven repositories, 287 tests. For each mutation: apply it, run the **whole** suite to find
 out what it really broke, then check the selection contained every one of those tests.
@@ -77,7 +76,7 @@ out what it really broke, then check the selection contained every one of those 
 ten broken tests were selected is a change whose regression reached production. Averaging
 would report that as 90% and make it sound like a near miss.
 
-### 100% is the expected answer, and that is the problem with it
+### Why 100% is the expected answer
 
 For a single-line change under line-level tracing, perfect safety is what the method
 *should* give. A clean number like that usually means the interesting cases were not
@@ -93,7 +92,7 @@ assert sub_test not in s.selected, (
 
 That test passes today. **The selector really does skip a test that the change really does
 break** — when the changed line is reached only from a subprocess, in a file that some other
-test imports in-process. See [what this does not do](#what-this-does-not-do).
+test imports in-process. See [what this does not do](#scope).
 
 ## How it works
 
@@ -149,7 +148,7 @@ src/test_impact_oracle/
   bench.py     safety against reduction, with an honest denominator
 ```
 
-## What this does NOT do
+## Scope
 
 - **It cannot see into a subprocess.** `settrace` fires for frames in this interpreter. The
   dangerous shape is a file imported in-process by one test and executed as a script by
@@ -173,29 +172,6 @@ src/test_impact_oracle/
 - **The corpus is seven of my own repositories.** They share an author and a style, they are
   all libraries, and none is large. 90% reduction on a 300-test suite is not evidence about a
   30,000-test monorepo.
-
-## Problems hit while building this
-
-- **The map was 90% pytest tracing itself.** `.venv` lives *inside* the repository, so "is
-  this file under the root?" happily admitted `site-packages`. blast-radius traced to 51
-  files and 1021 lines per test; with virtualenv directories excluded it is 4 files and 17.
-  (`build` and `dist` are deliberately *not* excluded — a project can ship its package at
-  `src/build/`, and skipping directories by name is how you report that a repo has no source.)
-- **An empty map reported success.** Tracing a src-layout project without putting its `src`
-  on the path traces whatever is installed instead; the imported files then sit outside the
-  traced root, get discarded, and the map comes back holding only the test files — while
-  still saying `traced_ok`. A map with no tests in it is now an error.
-- **The only unsafe result in the corpus was a regex.** `-rf` prints
-  `FAILED path::test[id] - AssertionError: ...` and the parser matched `\S+`, which stops at
-  the first space — so `test_counting[(x, y)-2]` was captured as `test_counting[(x,`. A
-  truncated id matches nothing in the selection, so the benchmark reported a missed test and
-  blamed the selector. Safety went from 97.7% to 100% by fixing the parser, and the same bug
-  was fixed in flake-detective, which shares the idiom.
-- **Mutating with `ast.unparse` rewrites the whole file.** It drops every comment and
-  reformats everything, so a one-line change arrives as a diff touching every line — and
-  several repositories in the corpus read their own source, which would fail their tests for
-  reasons the mutation had nothing to do with. Only the mutated statement's own lines are
-  rewritten now, re-indented and spliced back.
 
 ## Also worth reading
 
