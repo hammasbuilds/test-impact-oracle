@@ -157,3 +157,94 @@ def test_a_failure_reason_is_not_part_of_the_id(project, python):
     )
     r = suite.run(project, "tests", python=python)
     assert r.failed == {"tests/test_bad.py::test_fails"}
+
+
+# --- round-1 user-task regressions -------------------------------------------------------
+
+
+def _commit(repo: Path) -> None:
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "config", "user.email", "t@example.invalid")
+    _git(repo, "config", "user.name", "t")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "first")
+
+
+def _select_json(project: Path, python: str, capsys, *extra: str) -> dict:
+    import json
+
+    capsys.readouterr()
+    rc = main(["select", str(project), "--python", python, "--json", *extra])
+    out = capsys.readouterr().out
+    assert rc == 0, out
+    return json.loads(out)
+
+
+def test_a_project_in_a_git_subdirectory_keeps_its_reduction(tmp_path, python, make_project):
+    """git diff paths are toplevel-relative; the map's are project-relative. Without
+    `--relative` every change looked unknown and the selector ran everything."""
+    pkg = make_project(tmp_path / "mono" / "pkg")
+    _commit(tmp_path / "mono")
+    assert main(["map", str(pkg), "--python", python, "--quiet"]) == 0
+    util = pkg / "src" / "demo" / "util.py"
+    util.write_text(util.read_text(encoding="utf-8").replace('"negative"', '"NEG"'), "utf-8")
+    change = changed_from_git(pkg, "HEAD")
+    assert set(change.lines) == {"src/demo/util.py"}
+
+
+def test_a_changed_data_file_selects_everything(project, python, capsys):
+    _commit(project)
+    assert main(["map", str(project), "--python", python, "--quiet"]) == 0
+    (project / "tests" / "fixture.json").write_text('{"x": 2}', encoding="utf-8")
+    info = _select_json(project, python, capsys)
+    assert info["non_python_files"] == ["tests/fixture.json"]
+    assert info["selected"] == info["total"] == 3
+
+
+def test_docs_and_the_map_itself_are_not_changes(project, python, capsys):
+    _commit(project)
+    assert main(["map", str(project), "--python", python, "--quiet"]) == 0
+    assert (project / ".tio-map.json").exists(), "default map lives in the repo"
+    (project / "README.md").write_text("# new\n", encoding="utf-8")
+    capsys.readouterr()
+    assert main(["select", str(project), "--python", python]) == 0
+    assert "no code or data changes" in capsys.readouterr().out
+
+
+def test_a_deleted_module_is_not_silently_ignored(project):
+    _commit(project)
+    (project / "src" / "demo" / "util.py").unlink()
+    assert "src/demo/util.py" in changed_from_git(project, "HEAD").lines
+
+
+def test_select_json_lists_tests_and_reasons(project, python, capsys):
+    _commit(project)
+    assert main(["map", str(project), "--python", python, "--quiet"]) == 0
+    util = project / "src" / "demo" / "util.py"
+    util.write_text(util.read_text(encoding="utf-8").replace('"negative"', '"NEG"'), "utf-8")
+    info = _select_json(project, python, capsys)
+    assert info["tests"] == ["tests/test_util.py::test_label"]
+    assert "util.py" in info["reasons"]["tests/test_util.py::test_label"]
+
+
+def test_a_stale_map_is_reported_and_the_file_counted_as_changed(project, python, capsys):
+    assert main(["map", str(project), "--python", python, "--quiet"]) == 0
+    util = project / "src" / "demo" / "util.py"
+    util.write_text(util.read_text(encoding="utf-8").replace('"negative"', '"NEG"'), "utf-8")
+    _commit(project)  # the edit is now in HEAD, so the diff against HEAD is empty
+    capsys.readouterr()
+    assert main(["select", str(project), "--python", python, "--why"]) == 0
+    captured = capsys.readouterr()
+    assert "stale" in captured.err
+    assert "tests/test_util.py::test_label" in captured.out
+
+
+def test_an_interpreter_without_pytest_is_an_error_not_zero_tests(project, python, capsys):
+    _commit(project)
+    assert main(["map", str(project), "--python", python, "--quiet"]) == 0
+    util = project / "src" / "demo" / "util.py"
+    util.write_text(util.read_text(encoding="utf-8") + "\n", "utf-8")
+    capsys.readouterr()
+    rc = main(["select", str(project), "--python", str(project / "no-such-python")])
+    assert rc == 2
+    assert "could not collect tests" in capsys.readouterr().err

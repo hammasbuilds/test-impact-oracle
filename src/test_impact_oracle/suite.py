@@ -52,6 +52,18 @@ def env_for(repo: Path) -> dict[str, str]:
 def collect(
     repo: Path, target: str = "tests", python: str = "", timeout: float = 300.0
 ) -> list[str]:
+    return collect_with_error(repo, target, python, timeout)[0]
+
+
+def collect_with_error(
+    repo: Path, target: str = "tests", python: str = "", timeout: float = 300.0
+) -> tuple[list[str], str]:
+    """Node ids, and - when there are none - the reason pytest gave.
+
+    An empty list is ambiguous on its own: a suite with no tests, and an interpreter that
+    has no pytest, look the same. A selector handed `[]` reports "0/0 selected", which
+    reads as a confident answer.
+    """
     cmd = [
         python or sys.executable,
         "-m",
@@ -74,14 +86,17 @@ def collect(
             check=False,
             errors="replace",
         )
-    except (subprocess.TimeoutExpired, OSError):
-        return []
+    except (subprocess.TimeoutExpired, OSError) as e:
+        return [], f"{type(e).__name__}: {e}"
     out = []
     for line in (proc.stdout or "").splitlines():
         line = line.strip()
         if "::" in line and not line.startswith(("=", "-", "ERROR", "FAILED")):
             out.append(line)
-    return out
+    if out:
+        return out, ""
+    tail = ((proc.stderr or "") + (proc.stdout or "")).strip().splitlines()
+    return [], f"pytest exited {proc.returncode}: " + (tail[-1][:200] if tail else "no output")
 
 
 def run(

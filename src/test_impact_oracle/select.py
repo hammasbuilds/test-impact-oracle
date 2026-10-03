@@ -60,6 +60,9 @@ class Selection:
     unknown_files: list[str] = field(default_factory=list)
     """Changed files absent from the map, which forced everything to be selected."""
 
+    non_python_files: list[str] = field(default_factory=list)
+    """Changed data/config files. No tracer sees a JSON fixture being read, so everything runs."""
+
     @property
     def skipped(self) -> int:
         return self.total - len(self.selected)
@@ -75,6 +78,9 @@ class Selection:
             "skipped": self.skipped,
             "reduction": round(self.reduction, 4),
             "unknown_files": self.unknown_files,
+            "non_python_files": self.non_python_files,
+            "tests": sorted(self.selected),
+            "reasons": {t: self.reasons.get(t, "") for t in sorted(self.selected)},
         }
 
 
@@ -100,6 +106,14 @@ def select(m: Mapping, change: Change, all_tests: set[str] | None = None) -> Sel
     mapped_files = set(by_file)
 
     for path, lines in change.lines.items():
+        if not path.endswith(".py"):
+            # A fixture file, a config, a template: read with open(), never executed, so the
+            # map cannot say who depends on it.
+            s.non_python_files.append(path)
+            for t in every:
+                s.selected.add(t)
+                s.reasons.setdefault(t, f"non-Python file changed ({path})")
+            continue
         if path not in mapped_files:
             # Never executed by any test: new, renamed, or the map is stale. Which of those
             # it is cannot be told from here, and the wrong guess skips a real failure.

@@ -10,6 +10,7 @@ question is always "which tests reach these", so the inverted index is built on 
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -30,6 +31,10 @@ class Mapping:
     """test nodeid -> {"path/file.py:12", ...}"""
 
     seconds: float = 0.0
+    hashes: dict[str, str] = field(default_factory=dict)
+    """repo-relative path -> sha1 of the file as it was when traced. Lets `stale_files` tell
+    a map that no longer describes the tree from one that still does."""
+
     traced_ok: bool = True
     error: str = ""
 
@@ -64,6 +69,13 @@ class Mapping:
     def files(self) -> set[str]:
         return set(self.by_file())
 
+    def stale_files(self, root: Path | None = None) -> list[str]:
+        """Mapped files whose content differs from what was traced (or that are gone)."""
+        base = Path(root) if root is not None else self.root
+        return sorted(
+            path for path, digest in self.hashes.items() if file_hash(base / path) != digest
+        )
+
     def summary(self) -> dict:
         lines = {line for s in self.tests.values() for line in s}
         return {
@@ -85,6 +97,7 @@ class Mapping:
                 {
                     "root": str(self.root).replace(os.sep, "/"),
                     "seconds": self.seconds,
+                    "hashes": self.hashes,
                     "tests": {k: sorted(v) for k, v in self.tests.items()},
                 },
                 indent=0,
@@ -99,7 +112,15 @@ class Mapping:
             root=Path(data["root"]),
             tests={k: set(v) for k, v in data["tests"].items()},
             seconds=data.get("seconds", 0.0),
+            hashes=data.get("hashes", {}),
         )
+
+
+def file_hash(path: Path) -> str:
+    try:
+        return hashlib.sha1(path.read_bytes()).hexdigest()
+    except OSError:
+        return ""
 
 
 def _plugin_dir() -> Path:
@@ -185,6 +206,7 @@ def build(
         tail = ((proc.stderr or "") + (proc.stdout or "")).strip().splitlines()
         m.error = "tracer recorded no tests: " + (tail[-1][:200] if tail else "no output")
         return m
+    m.hashes = {f: file_hash(repo / f) for f in m.files}
     m.seconds = time.time() - started
     out.unlink(missing_ok=True)
     return m
