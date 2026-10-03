@@ -126,8 +126,8 @@ def test_a_stale_map_selects_by_line_numbers_that_have_moved(tmp_path, python, m
     """The map is a photograph. Insert a line above a function and every line below it
     shifts, so a diff naming line 12 no longer means what the map's line 12 meant.
 
-    Nothing here detects that. The map has to be rebuilt when the tree moves, and the tool
-    says so rather than pretending a stored map stays true.
+    `select()` alone cannot detect that; the CLI compares stored file hashes and widens the
+    change to the whole file (see test_suite_and_cli). This test pins the raw behaviour.
     """
     root = make_project(tmp_path / "p")
     m = mapping.build(root, "tests", python=python)

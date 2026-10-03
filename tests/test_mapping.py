@@ -138,3 +138,14 @@ def test_the_map_is_written_to_an_absolute_path(project, python, tmp_path, monke
     m = mapping.build(Path(project), "tests", python=python)
     assert m.traced_ok, m.error
     assert m.tests
+
+
+def test_a_line_ending_rewrite_does_not_make_the_map_stale(tmp_path):
+    from test_impact_oracle.mapping import file_hash
+
+    a, b = tmp_path / "a.py", tmp_path / "b.py"
+    a.write_bytes(b"x = 1\ny = 2\n")
+    b.write_bytes(b"x = 1\r\ny = 2\r\n")
+    assert file_hash(a) == file_hash(b)
+    b.write_bytes(b"x = 1\r\ny = 3\r\n")
+    assert file_hash(a) != file_hash(b)

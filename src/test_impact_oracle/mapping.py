@@ -118,7 +118,9 @@ class Mapping:
 
 def file_hash(path: Path) -> str:
     try:
-        return hashlib.sha1(path.read_bytes()).hexdigest()
+        # Line endings are normalised: a `git checkout` under core.autocrlf rewrites LF as
+        # CRLF without changing a single line, and must not mark the map stale.
+        return hashlib.sha1(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     except OSError:
         return ""
 

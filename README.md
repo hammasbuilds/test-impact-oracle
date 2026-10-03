@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/python-3.11%2B-blue" alt="python">
   <img src="https://img.shields.io/badge/runtime%20deps-0-brightgreen" alt="zero dependencies">
   <img src="https://img.shields.io/badge/model-none%20required-success" alt="no model">
-  <img src="https://img.shields.io/badge/tests-60-brightgreen" alt="tests">
+  <img src="https://img.shields.io/badge/tests-68-brightgreen" alt="tests">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="license"></a>
 </p>
 
@@ -125,12 +125,24 @@ git clone https://github.com/hammasbuilds/test-impact-oracle
 cd test-impact-oracle
 uv venv && uv pip install -e ".[dev]"
 
+python demo.py                                                  # ~15s, throwaway project
+
 tio map /path/to/repo --python /path/to/repo/.venv/bin/python   # once, slow
 tio select /path/to/repo --since origin/main --why              # what to run, and why
 tio select /path/to/repo --since origin/main --run              # and run it
+tio select /path/to/repo --since origin/main --json             # for CI scripts
 
 tio bench /path/to/repo /path/to/other --mutants 12             # is it actually safe?
 ```
+
+The map is written to `<repo>/.tio-map.json` (override with `--out` / `--map`). The diff
+covers committed, uncommitted and untracked files, with paths relative to the project
+directory, so a package in a monorepo subdirectory works. Documentation (`*.md`, `*.rst`,
+`docs/`, `LICENSE`) is ignored; any other non-Python change - a JSON fixture, a config, a
+template - selects the whole suite, because no tracer can see a file being read. `--json`
+prints `tests`, `reasons`, `selected`, `total`, `reduction`, `non_python_files`,
+`unknown_files` and `stale_files`. If pytest cannot collect the suite (wrong `--python`,
+import error) `select` exits 2 with pytest's message rather than reporting `0/0`.
 
 Needs no model, no API key, no GPU, no runtime dependencies. The benchmark works on a
 **copy**, with the copy's `src` ahead of any editable install, so the repositories being
@@ -157,9 +169,11 @@ src/test_impact_oracle/
   `tests/test_blind_spots.py`.
 - **It cannot see into C.** Behaviour reached only through a compiled extension records
   nothing.
-- **A stale map is silently wrong.** Insert a line at the top of a file and every line below
-  it shifts; a diff naming line 12 no longer means what the map's line 12 meant. Nothing here
-  detects that. Rebuild the map when the tree moves.
+- **A stale map is detected, not repaired.** Insert a line at the top of a file and every line
+  below it shifts; a diff naming line 12 no longer means what the map's line 12 meant. The map
+  stores a hash of every traced file; `select` warns when a mapped file differs from what was
+  traced but is not in the diff, and treats that whole file as changed. That keeps selection
+  safe but costs reduction - rebuild the map when the tree moves.
 - **`pytest-xdist` is refused, not tolerated.** Tracing under `-n` would install the tracer
   per worker and interleave the attribution. The plugin raises rather than writing a map that
   looks right.
